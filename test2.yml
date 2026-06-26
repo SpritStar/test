@@ -1,0 +1,28 @@
+name: test variable
+on:
+  workflow_dispatch:
+
+env:
+  version: "1.10"  
+
+jobs:
+	stage:
+    runs-on: ubuntu-latest
+    
+    steps:
+		- name: Run tests
+			run: |
+				echo "env"
+				echo "${{ env.version }}"
+
+				echo "repo vari"
+				echo "${{ vars.USERNAME }}"
+
+				echo "repo secret"
+				echo "${{ secrets.PASSWORD }}"
+
+				echo "org vari"
+				echo "${{ vars.NAME }}"
+
+				echo "org secret"
+				echo "${{ secrets.NPMRC }}"
