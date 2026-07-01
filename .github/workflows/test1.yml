@@ -1,20 +1,21 @@
-name: Test Workflow
+name: test1
 
 on:
   workflow_dispatch:
 
 jobs:
-    stage:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v5
+  stage:
+    runs-on: ubuntu-latest
     
-            - name: Run tests
-              run: |
-                echo "pwd"
-                pwd
-                echo "ls -al"
-                ls -al
-                echo "env"
-                env
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+    
+    - name: print
+      run: |
+        echo "pwd"
+        pwd
+        echo "ls -al"
+        ls -al
+        echo "env"
+        env

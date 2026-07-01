@@ -1,0 +1,58 @@
+name: test4 action
+
+on:
+  workflow_dispatch:
+
+env:
+  artifact_name: manifest
+  artifact_path: manifest
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run tests
+        run: |
+          IMAGE_TAG2=$( date +"%Y%m%d%H%M%S" )
+          echo "IMAGE_TAG=${IMAGE_TAG2}" >> $GITHUB_ENV
+
+      - name: update mainfest
+        run: |
+          sed -i "s|\${IMAGE}|${{ env.IMAGE_TAG }}|g" manifest/qa.yml
+          sed -i "s|\${IMAGE}|${{ env.IMAGE_TAG }}|g" manifest/prod.yml
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.artifact_name}}
+          path: ${{ env.artifact_path }}
+          include-hidden-files: true
+          retention-days: 3
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        include:
+          - environment: 'qa'
+            deploy_file: 'qa.yml'
+          - environment: 'prod'
+            deploy_file: 'prod.yml'
+
+    environment: ${{ matrix.environment }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Action
+        uses: ./.github/actions/deploy
+        with:
+          ARTIFACT_PATH: ${{ env.artifact_path }}
+          ARTIFACT_NAME: ${{ env.artifact_name }}
+          DEPLOY_FILE: ${{ matrix.deploy_file }}
+          LLM: ${{ vars.LLM }}

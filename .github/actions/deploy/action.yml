@@ -1,0 +1,33 @@
+name: cd deploy
+description: "cd deploy action"
+
+inputs:
+  ARTIFACT_PATH:
+    required: true
+  ARTIFACT_NAME:
+    required: true
+  DEPLOY_FILE:
+    required: true       
+  LLM:
+    required: false
+    default: " "  
+
+runs:
+  using: "composite"
+  steps:
+    - name: remove old artifacts
+      shell: bash
+      run: rm -rf ${{ inputs.ARTIFACT_PATH }}
+      
+    - name: download artifacts
+      uses: actions/download-artifact@v5
+      with:
+        name: ${{ inputs.ARTIFACT_NAME }}
+        path: ${{ inputs.ARTIFACT_PATH }}
+
+    - name: Deploy
+      shell: bash    
+      run: |
+        echo ${{ inputs.LLM }}
+        cat ${{ inputs.ARTIFACT_PATH}}/${{ inputs.DEPLOY_FILE}}
+        
